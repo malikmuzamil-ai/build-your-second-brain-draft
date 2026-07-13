@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1 Playbook — Build Your AI Second Brain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0c0e;
+    --panel:#141416;
+    --panel-2:#1a1a1d;
+    --line:#26262a;
+    --red:#e8332e;
+    --red-dim:rgba(232,51,46,.12);
+    --text:#ececec;
+    --muted:#9a9aa2;
+    --green:#3ecf7a;
+    --amber:#f5a623;
+    --mono:'JetBrains Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;line-height:1.65}
+  .wrap{max-width:860px;margin:0 auto;padding:0 28px}
+
+  /* ---------- header ---------- */
+  header{padding:72px 0 56px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:20px}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(34px,5.5vw,54px);font-weight:700;line-height:1.08;letter-spacing:-.02em}
+  h1 .accent{color:var(--red)}
+  .sub{margin-top:20px;font-size:18px;color:var(--muted);max-width:600px}
+  .meta{display:flex;gap:28px;margin-top:32px;flex-wrap:wrap}
+  .meta div{font-family:var(--mono);font-size:13px;color:var(--muted)}
+  .meta strong{color:var(--text);display:block;font-size:15px;margin-top:2px}
+
+  /* ---------- the rail ---------- */
+  .stage{position:relative;padding:56px 0 8px}
+  .stage::before{content:"";position:absolute;left:19px;top:0;bottom:0;width:2px;background:var(--line)}
+  .stage-head{display:flex;align-items:center;gap:20px;margin-bottom:8px}
+  .stage-num{width:40px;height:40px;border-radius:50%;background:var(--red);color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1}
+  .stage h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(24px,3.5vw,32px);font-weight:600;letter-spacing:-.01em}
+  .stage-body{padding-left:60px}
+  .stage-intro{color:var(--muted);max-width:640px;margin-bottom:36px}
+  .stage-intro em{color:var(--text);font-style:normal;font-weight:600}
+
+  /* ---------- workflow cards ---------- */
+  .wf{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:32px;margin-bottom:28px}
+  .wf-tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+  .wf h3{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:600;margin-bottom:6px}
+  .wf .gives{font-size:14px;color:var(--muted);margin-bottom:24px}
+  .wf .gives b{color:var(--text)}
+  ol.steps{list-style:none;counter-reset:s}
+  ol.steps li{counter-increment:s;position:relative;padding:0 0 18px 44px}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:6px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);font-family:var(--mono);font-size:12px;display:flex;align-items:center;justify-content:center}
+  ol.steps li b{color:var(--text)}
+  ol.steps li .path{font-family:var(--mono);font-size:13px;color:var(--amber)}
+  kbd{font-family:var(--mono);font-size:13px;background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:2px 7px;color:var(--text);white-space:nowrap}
+
+  /* ---------- terminal / prompt blocks ---------- */
+  .term{background:#0a0a0c;border:1px solid var(--line);border-radius:10px;margin:18px 0 6px;overflow:hidden}
+  .term-bar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line)}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .dot:nth-child(1){background:#ff5f57}.dot:nth-child(2){background:#febc2e}.dot:nth-child(3){background:#28c840}
+  .term-bar span{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:8px}
+  .term pre{padding:18px 20px;font-family:var(--mono);font-size:13.5px;line-height:1.7;color:#c8e8c8;white-space:pre-wrap;word-break:break-word}
+  .term pre .cm{color:#6a6a72}
+
+  /* ---------- done / warning ---------- */
+  .done{display:flex;gap:12px;align-items:flex-start;background:rgba(62,207,122,.08);border:1px solid rgba(62,207,122,.25);border-radius:8px;padding:14px 18px;margin-top:20px;font-size:14.5px}
+  .done .ic{color:var(--green);font-family:var(--mono);font-weight:600}
+  .warn{display:flex;gap:12px;align-items:flex-start;background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.25);border-radius:8px;padding:14px 18px;margin-top:12px;font-size:14.5px;color:var(--muted)}
+  .warn .ic{color:var(--amber);font-family:var(--mono);font-weight:600}
+  .warn b{color:var(--text)}
+
+  /* ---------- the distinction band ---------- */
+  .band{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:8px 0 40px}
+  .band>div{background:var(--panel);padding:26px 28px}
+  .band .k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}
+  .band .k.what{color:var(--amber)}
+  .band .k.how{color:#e878d0}
+  .band h4{font-family:'Space Grotesk',sans-serif;font-size:18px;margin-bottom:6px}
+  .band p{font-size:14px;color:var(--muted)}
+  @media(max-width:640px){.band{grid-template-columns:1fr}}
+
+  /* ---------- outputs table ---------- */
+  .files{width:100%;border-collapse:collapse;margin:20px 0 4px;font-size:14.5px}
+  .files th{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:0 14px 10px;border-bottom:1px solid var(--line)}
+  .files td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  .files td:first-child{font-family:var(--mono);font-size:13px;color:var(--amber);white-space:nowrap}
+  .files tr:last-child td{border-bottom:none}
+
+  /* ---------- checklist ---------- */
+  .check{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:32px;margin:8px 0}
+  .check h3{font-family:'Space Grotesk',sans-serif;font-size:20px;margin-bottom:18px}
+  .check ul{list-style:none}
+  .check li{display:flex;gap:14px;padding:9px 0;font-size:15px;align-items:flex-start}
+  .check li::before{content:"";width:18px;height:18px;border:2px solid var(--red);border-radius:5px;flex-shrink:0;margin-top:3px}
+  .check li code{font-family:var(--mono);font-size:13px;color:var(--amber)}
+
+  /* ---------- prework banner ---------- */
+  .prework{border:1px solid var(--red);background:var(--red-dim);border-radius:12px;padding:26px 30px;margin:48px 0 0}
+  .prework .k{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+  .prework p{font-size:15px}
+  .prework b{color:var(--text)}
+
+  footer{padding:56px 0 72px;border-top:1px solid var(--line);margin-top:64px;text-align:center}
+  footer .brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px}
+  footer .brand span{color:var(--red)}
+  footer p{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:6px}
+
+  .section-gap{height:24px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Day 1 Playbook &nbsp;·&nbsp; Live Workshop · 17–18 July 2026</div>
+  <h1>From raw data to a <span class="accent">live second brain</span> in one day.</h1>
+  <p class="sub">Everything Day 1 covers, in order: collect your data, extract your Voice DNA, build the brain in Obsidian + Claude Code. Follow this document top to bottom and you finish with a system that knows your business and writes in your voice.</p>
+  <div class="meta">
+    <div>Session length<strong>3 hours</strong></div>
+    <div>You need<strong>Laptop · LinkedIn · Gmail</strong></div>
+    <div>You leave with<strong>A working second brain</strong></div>
+  </div>
+</header>
+
+<!-- ======================= STEP 1 ======================= -->
+<section class="stage">
+  <div class="stage-head">
+    <div class="stage-num">1</div>
+    <h2>Data Collection</h2>
+  </div>
+  <div class="stage-body">
+    <p class="stage-intro">Your second brain is only as good as what you feed it. Before it can write anything, it needs to know <em>what you do</em> and <em>how you talk</em> — and those live in two different places.</p>
+
+    <div class="band">
+      <div>
+        <div class="k what">Source of WHAT you do</div>
+        <h4>Your LinkedIn posts</h4>
+        <p>On stage. Positioned. Your offer, your clients, your results, your beliefs about the industry — the best written record of your business that exists.</p>
+      </div>
+      <div>
+        <div class="k how">Source of HOW you talk</div>
+        <h4>Your sent emails</h4>
+        <p>Off stage. No hooks, no performance. Just you explaining things to one real person. The closest thing to your natural voice in writing.</p>
+      </div>
+    </div>
+
+    <!-- workflow A -->
+    <div class="wf">
+      <div class="wf-tag">Workflow A · Pre-work — do this 2 days before</div>
+      <h3>LinkedIn Export</h3>
+      <p class="gives">Gives you: <b>your full post history</b> — business context and public voice in one file.</p>
+      <ol class="steps">
+        <li>On LinkedIn, click your photo (top right) → <b>Settings &amp; Privacy</b></li>
+        <li>Left menu → <b>Data Privacy</b> → <b>Get a copy of your data</b></li>
+        <li>Choose <b>"Want something in particular?"</b> and tick <b>Posts</b> and <b>Messages</b>. Skip the full archive — that one takes a day.</li>
+        <li>Click <b>Request archive</b>, confirm your password. LinkedIn emails you a download link in ~15 minutes.</li>
+        <li>Download the .zip, unzip it, find <span class="path">Shares.csv</span> — every post you have ever published.</li>
+        <li>Drag <span class="path">Shares.csv</span> into your vault's <span class="path">00-Inbox</span> folder. Don't open it in Excel. Don't clean it.</li>
+      </ol>
+      <div class="done"><span class="ic">DONE →</span><span><span style="font-family:var(--mono);font-size:13px;color:var(--amber)">00-Inbox/Shares.csv</span> is sitting in your vault, untouched.</span></div>
+      <div class="warn"><span class="ic">FALLBACK</span><span>Archive didn't arrive, or you have under 10 posts? Open your profile → <b>Show all activity → Posts</b>, copy your 10 best posts (the ones that got comments) into a blank doc, save as <b>my-posts.md</b>, drop it in 00-Inbox. Five minutes, same result.</span></div>
+    </div>
+
+    <!-- workflow B -->
+    <div class="wf">
+      <div class="wf-tag">Workflow B · Live on Day 1 — 5 minutes</div>
+      <h3>Sent Emails via Gmail Connector</h3>
+      <p class="gives">Gives you: <b>15–20 of your real client replies</b> — your voice with nobody watching.</p>
+      <ol class="steps">
+        <li>In Claude (claude.ai), click the <b>connectors icon</b> in the chat input → find <b>Gmail</b> → <b>Connect</b></li>
+        <li>Sign in with the account you actually email clients from, approve access</li>
+        <li>Run the extraction prompt below — Claude searches your sent folder and pulls only the words <b>you</b> wrote</li>
+        <li>Download the compiled file, rename it <span class="path">voice-emails.md</span>, drop it into <span class="path">00-Inbox</span></li>
+      </ol>
+      <div class="term">
+        <div class="term-bar"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>claude.ai — Gmail connected</span></div>
+        <pre>Search my sent emails from the last 90 days. Ignore newsletters,
+calendar invites, and one-line replies under 20 words. Find 15-20
+emails where I explain my work, answer a client question, handle
+an objection, or describe my offer. Extract ONLY the text I wrote —
+strip signatures, quoted threads, and legal footers. Compile it
+into one markdown document, each email as its own section,
+labeled by topic (not the recipient's name).</pre>
+      </div>
+      <div class="done"><span class="ic">DONE →</span><span><span style="font-family:var(--mono);font-size:13px;color:var(--amber)">00-Inbox/voice-emails.md</span> exists — your replies only, no signatures, no quoted text.</span></div>
+      <div class="warn"><span class="ic">FALLBACK</span><span>On Outlook or won't connect? In Gmail search <b>in:sent after:2026/04/01</b>, open 15 substantive threads, copy only your replies into a doc. Ten minutes of copy-paste, guaranteed to work. Strip anything with passwords or invoices before it enters the vault.</span></div>
+    </div>
+
+    <!-- workflow C -->
+    <div class="wf">
+      <div class="wf-tag">Workflow C · Live on Day 1 — 5 minutes</div>
+      <h3>Business Documents</h3>
+      <p class="gives">Gives you: <b>depth the posts don't have</b> — proposals, offer one-pagers, sales decks, old website copy.</p>
+      <ol class="steps">
+        <li>Open Google Drive, Notion, or your desktop — wherever your business documents live</li>
+        <li>Grab anything that explains your offer: proposals you've sent, a pitch deck, your website copy, an FAQ you keep answering</li>
+        <li>Export or copy each into <span class="path">00-Inbox</span> — PDF, .md, .docx, all fine. Messy is fine. It lands raw.</li>
+        <li><b>No documents at all?</b> Record a 10-minute voice note answering: who do you help, what result did you last deliver, what do clients always ask, what does your industry get wrong, what's your offer. Transcribe it, save as <span class="path">brain-dump.md</span>.</li>
+      </ol>
+      <div class="done"><span class="ic">DONE →</span><span>3–6 business files sitting in <span style="font-family:var(--mono);font-size:13px;color:var(--amber)">00-Inbox</span> alongside your posts and emails.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-gap"></div>
+
+<!-- ======================= STEP 2 ======================= -->
+<section class="stage">
+  <div class="stage-head">
+    <div class="stage-num">2</div>
+    <h2>Voice DNA Extraction</h2>
+  </div>
+  <div class="stage-body">
+    <p class="stage-intro">One skill reads everything in your inbox and produces the two files your entire second brain stands on. This is the moment the raw data becomes <em>you, written down</em>.</p>
+
+    <div class="wf">
+      <div class="wf-tag">The Voice DNA Extractor Skill</div>
+      <h3>One prompt. Two foundation files.</h3>
+      <p class="gives">Runs inside Claude Code, in your vault. Reads posts + emails + documents, and writes evidence-based profiles — nothing invented, everything quoted from your own words.</p>
+      <div class="term">
+        <div class="term-bar"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>claude code — ~/Second Brain</span></div>
+        <pre>Read everything in 00-Inbox: Shares.csv (my LinkedIn posts),
+voice-emails.md (my sent emails), and all business documents.
+
+TASK 1 — create Raw/voice-dna.md from my posts AND emails:
+- Sentence rhythm: short and punchy or long and flowing? 2 real examples.
+- Vocabulary: 10 words or phrases I use repeatedly.
+- How I open: my 3 most common hook patterns, with real examples.
+- How I close: what my CTAs and sign-offs sound like.
+- Conviction: do I hedge or state things directly? Show proof.
+- Email voice vs post voice: what changes when I write 1-on-1.
+- 5 phrases that are unmistakably mine.
+
+TASK 2 — create Raw/business-context.md from posts AND documents:
+- Who I help (in the exact words I use)
+- What I sell: offers, and pricing if stated anywhere
+- Results I point to: every specific number or client outcome found
+- What I believe my industry gets wrong
+- Questions clients keep asking (from emails and FAQ)
+
+Use ONLY evidence from my files. Do not invent patterns.
+If any section lacks evidence, say what's missing instead of guessing.</pre>
+      </div>
+
+      <table class="files">
+        <tr><th>Output file</th><th>What it holds</th><th>What it powers</th></tr>
+        <tr><td>Raw/voice-dna.md</td><td>How you talk — rhythm, vocabulary, hooks, conviction, signature phrases</td><td>Every post, DM, and email the brain will ever write for you</td></tr>
+        <tr><td>Raw/business-context.md</td><td>What you do — ICP, offer, proof, beliefs, client FAQs</td><td>Positioning, content strategy, and never re-explaining yourself again</td></tr>
+      </table>
+
+      <div class="done"><span class="ic">DONE →</span><span>Open <span style="font-family:var(--mono);font-size:13px;color:var(--amber)">voice-dna.md</span> and read it. If your reaction is "yeah, that's how I write" — it worked. If it feels generic, you fed it too few posts: add more via the fallback and rerun.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-gap"></div>
+
+<!-- ======================= STEP 3 ======================= -->
+<section class="stage">
+  <div class="stage-head">
+    <div class="stage-num">3</div>
+    <h2>Build the Brain — Obsidian + Claude Code</h2>
+  </div>
+  <div class="stage-body">
+    <p class="stage-intro">Now the container. Obsidian holds the files, Claude Code does the thinking, and one shared folder connects them. Five moves and the brain is live.</p>
+
+    <div class="wf">
+      <div class="wf-tag">Setup · ~20 minutes</div>
+      <h3>The five moves</h3>
+      <ol class="steps">
+        <li><b>Download Obsidian</b> from obsidian.md — free, works on Mac and Windows. Install and open it.</li>
+        <li><b>Create your vault.</b> Click <b>Create new vault</b>, name it <span class="path">Second Brain</span>, and save it somewhere you can find — Documents works. A vault is just a normal folder on your computer. That's the whole trick.</li>
+        <li><b>Build the folder skeleton</b> inside the vault: <span class="path">00-Inbox</span> (raw data lands here) · <span class="path">Raw</span> (permanent sources like voice-dna.md) · <span class="path">Wiki</span> (Claude's synthesized notes) · <span class="path">Sessions</span> (what Claude did each run). Move your Step 1 files into 00-Inbox now if they're still on your desktop.</li>
+        <li><b>Install Claude Code.</b> Node.js goes in first (nodejs.org, LTS version), then in your terminal: <kbd>npm install -g @anthropic-ai/claude-code</kbd>. Sign in when it asks.</li>
+        <li><b>Connect the two.</b> In the terminal, navigate into your vault — <kbd>cd Documents/Second&nbsp;Brain</kbd> — then type <kbd>claude</kbd>. Claude Code now sees every file in your vault. Obsidian and Claude Code are working on the same folder: one is your window, the other is the worker.</li>
+      </ol>
+      <div class="warn"><span class="ic">NOTE</span><span><b>Spaces in folder names</b> trip up terminals. If <b>cd Second Brain</b> fails, use <b>cd "Second Brain"</b> with quotes — announce this from stage before anyone hits it.</span></div>
+    </div>
+
+    <div class="wf">
+      <div class="wf-tag">The brain's constitution</div>
+      <h3>Write CLAUDE.md</h3>
+      <p class="gives">The one file Claude Code reads before every session. It tells the brain who you are, where things live, and how to behave. Keep it under 500 words.</p>
+      <div class="term">
+        <div class="term-bar"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Second Brain / CLAUDE.md</span></div>
+        <pre><span class="cm"># Who I am</span>
+[Name], [role]. I help [ICP] achieve [result].
+
+<span class="cm"># My vault</span>
+00-Inbox = unprocessed data. Raw = permanent sources.
+Wiki = your synthesized notes. Sessions = log every run here.
+
+<span class="cm"># Standing rules</span>
+- Before writing ANY content, read Raw/voice-dna.md
+  and Raw/business-context.md first.
+- Never invent client results or numbers.
+- Log what you did each session in Sessions/.
+- Ask before deleting anything.</pre>
+      </div>
+      <div class="done"><span class="ic">DONE →</span><span>Test it. In Claude Code type: <i>"Read my voice-dna.md and write one LinkedIn post about [your topic] in my voice."</i> When the draft comes back sounding like you — your second brain is officially live.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-gap"></div>
+
+<!-- ======================= END STATE ======================= -->
+<section class="stage">
+  <div class="stage-head">
+    <div class="stage-num">✓</div>
+    <h2>End of Day 1 — what exists now</h2>
+  </div>
+  <div class="stage-body">
+    <div class="check">
+      <h3>Your checklist</h3>
+      <ul>
+        <li><code>Second Brain</code> vault created in Obsidian with <code>00-Inbox / Raw / Wiki / Sessions</code></li>
+        <li>LinkedIn posts (<code>Shares.csv</code>), sent emails (<code>voice-emails.md</code>), and business docs in the inbox</li>
+        <li><code>Raw/voice-dna.md</code> — reads like you, built from evidence</li>
+        <li><code>Raw/business-context.md</code> — your offer, ICP, and proof in one place</li>
+        <li>Claude Code installed, signed in, and running inside the vault</li>
+        <li><code>CLAUDE.md</code> written — the brain knows its rules</li>
+        <li>First test post generated in your voice</li>
+      </ul>
+    </div>
+    <p class="stage-intro" style="margin-top:28px">Day 2 builds on every one of these files: the approval system, the content library, and connecting the brain to your marketing system. Nothing from today gets thrown away — it all compounds.</p>
+  </div>
+</section>
+
+<div class="prework">
+  <div class="k">Do this today — not on workshop day</div>
+  <p><b>Request your LinkedIn archive right now.</b> It's the only step with a waiting period. The email and document workflows run live in minutes, but LinkedIn makes you wait for the download — and on the 17th you should be building, not refreshing your inbox.</p>
+</div>
+
+<footer>
+  <div class="brand">Purely <span>Personal</span></div>
+  <p>Build Your AI Second Brain · Live Workshop · 17–18 July 2026</p>
+</footer>
+
+</div>
+</body>
+</html>
